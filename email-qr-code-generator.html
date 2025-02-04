@@ -1,0 +1,115 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Email QR Code Generator</title>
+    <link rel="icon" href="https://jkts.ca/favicon.png" type="image/png">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            text-align: center;
+            padding: 20px;
+            margin: 0;
+            box-sizing: border-box;
+        }
+        .container {
+            max-width: 400px;
+            margin: auto;
+            padding: 20px;
+            border: 1px solid #ccc;
+            border-radius: 10px;
+            box-shadow: 2px 2px 10px rgba(0, 0, 0, 0.1);
+            box-sizing: border-box;
+        }
+        input, textarea, button {
+            width: calc(100% - 20px);
+            margin: 5px 0;
+            padding: 10px;
+            font-size: 16px;
+            box-sizing: border-box;
+        }
+        #qrcode {
+            margin-top: 20px;
+            display: flex;
+            justify-content: center;
+        }
+        #download {
+            margin-top: 10px;
+            display: none;
+            padding: 10px;
+            font-size: 16px;
+            background-color: #007BFF;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+        #download:hover {
+            background-color: #0056b3;
+        }
+        footer {
+            margin-top: 20px;
+            font-size: 14px;
+            color: #555;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h2>Email QR Code Generator</h2>
+        <input type="email" id="email" placeholder="Enter recipient email" required>
+        <input type="text" id="subject" placeholder="Enter subject (max 50 chars)" maxlength="50">
+        <textarea id="body" placeholder="Enter message (max 150 chars)" maxlength="150"></textarea>
+        <button onclick="generateQR()">Generate QR Code</button>
+        <div id="qrcode"></div>
+        <button id="download" onclick="downloadQR()">Download QR Code</button>
+    </div>
+
+    <footer>
+        Copyright &copy; 2025. JK Traffic Solutions Inc. All Rights Reserved.
+    </footer>
+
+    <script>
+        function generateQR() {
+            const email = document.getElementById('email').value.trim();
+            const subject = document.getElementById('subject').value.trim();
+            const body = document.getElementById('body').value.trim();
+            
+            if (!email) {
+                alert("Please enter a valid email address.");
+                return;
+            }
+            
+            const encodedSubject = encodeURIComponent(subject);
+            const encodedBody = encodeURIComponent(body);
+            const mailtoLink = `mailto:${email}?subject=${encodedSubject}&body=${encodedBody}`;
+            
+            document.getElementById('qrcode').innerHTML = ""; // Clear previous QR
+            const qrCodeElement = new QRCode(document.getElementById("qrcode"), mailtoLink);
+
+            setTimeout(() => { // Ensure QR is fully rendered
+                const qrCanvas = document.querySelector("#qrcode canvas");
+                if (qrCanvas) {
+                    const downloadButton = document.getElementById('download');
+                    downloadButton.style.display = 'inline-block';
+                }
+            }, 500);
+        }
+
+        function downloadQR() {
+            const qrCanvas = document.querySelector("#qrcode canvas");
+            if (qrCanvas) {
+                const imageData = qrCanvas.toDataURL("image/png");
+                const link = document.createElement("a");
+                link.href = imageData;
+                link.download = "qr-code.png";
+                link.click();
+            } else {
+                alert("Please generate a QR code first.");
+            }
+        }
+    </script>
+</body>
+</html>
